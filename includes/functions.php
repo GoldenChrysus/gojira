@@ -49,18 +49,6 @@ function stripPhpExtension($string) {
 	return str_replace(".php", "", $string);
 }
 
-function bindResultArray($stmt) {
-	$meta = $stmt->result_metadata();
-	$result = array();
-	while ($field = $meta->fetch_field()) {
-		$result[$field->name] = NULL;
-		$params[] = &$result[$field->name];
-	}
-
-	call_user_func_array(array($stmt, 'bind_result'), $params);
-	return $result;
-}
-
 function getRequestFile() {
 	return stripPhpExtension(explode("?", array_slice(array_values(explode("/", $_SERVER["REQUEST_URI"])), -1)[0])[0]);
 }

@@ -3,10 +3,9 @@ class User {
 	private $id;
 	private $data;
 
-	// We'll add salts to the config file soon so they are not hard-coded into a public repo
 	private static $salts = [
-		"jira" => "a random SHA-512 salt",
-		"ssh"  => "a random SHA-512 salt"
+		"jira" => JIRA_SALT,
+		"ssh"  => SSH_SALT
 	];
 
 	public function __construct($id = null) {
@@ -97,7 +96,7 @@ class User {
 
 		foreach ($data as $key => $value) {
 			$updates[] = "{$key} = ?";
-			$values[]  = $value["value"];
+			$values[]  = ($value["value"]) ?: "NULL";
 		}
 
 		if (count($updates) === 0) {
@@ -143,6 +142,15 @@ class User {
 			$value = self::hashPassword($userSalt, $value);
 		}
 
+		$value = ($value) ?: "NULL";
+
+		$data = [
+			0 => [
+				$value,
+				$this->id
+			]
+		];
+
 		$sql = 
 			"UPDATE
 				users
@@ -151,7 +159,7 @@ class User {
 			WHERE
 				id = ?";
 
-		Database::query($sql, [0 => [$value, $this->id]]);
+		Database::query($sql, $data);
 
 		return true;
 	}

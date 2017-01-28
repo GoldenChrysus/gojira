@@ -5,6 +5,8 @@
 $domain     = "";
 $systemName = ""; // name of your platform or service, displayed throughotu GOJIRA
 $currentVer = ""; // the current top-level version of your project; if the version number is used in your SVN URL, then it should be that value; e.g. svn://myproject.com/versions/3.0/trunk, then the version should be 3.0
+$jiraSalt   = ""; // used to salt JIRA credentials
+$sshSalt    = ""; // used to salt SSH credentials
 
 /**
  * JIRA settings
