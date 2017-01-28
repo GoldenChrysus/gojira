@@ -1,0 +1,15 @@
+# Take away that pesky little www
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^www\.domain\.com$ [NC]
+RewriteRule ^(.*)$ http://domain.com/$1 [R=301,L]
+
+# Hide .php extension
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php
+
+# Some permalinks
+RewriteRule ^register manage [NC]
+
+# 404 handling
+ErrorDocument 404 http://domain.com/create
