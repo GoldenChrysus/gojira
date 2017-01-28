@@ -3,9 +3,10 @@ class User {
   private $id;
   private $data;
 
+  // We'll add salts to the config file soon so they are not hard-coded into a public repo
   private static $salts = [
-    "jira" => "326efb112b92f4b26d7336f85bde8a87531d93f246ceb9bd906baf7e26360f02744d4d493478894dbb1724fbbba69650446472cd19d81106b68ab4832a7dd39e",
-    "ssh"  => "501a299f268a1a218076e4a2b8c889927d1ae1b049f41b5ac67e26c9fd27860b07f47c4c9c29cbdd7a954b215933a7e1ebd2e9424129caed011fc6cb6270f378"
+    "jira" => "a random SHA-512 salt",
+    "ssh"  => "a random SHA-512 salt"
   ];
 
   public function __construct($id = null) {
