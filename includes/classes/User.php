@@ -230,10 +230,14 @@ class User {
 		$result = Database::get($sql, [$username]);
 
 		if ($result) {
-			return $result[0]["id"];
+			if ($returnId) {
+				return $result[0]["id"];
+			}
+
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	public static function tryLogin($username, $password) {
