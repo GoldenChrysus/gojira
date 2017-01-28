@@ -119,8 +119,8 @@ if ($_POST) {
 		echo "</div>";
 		$ssh->exec("open -a Terminal");
 		$ssh->exec("cd {$devFolder}");
-		$ssh->exec("svn cp " . SVN_TRUNK . " " . SVN_DEV . "/{$branchName} -m \"Created with Patrick's GOJIRA service.\"");
-		$ssh->exec("svn co " . SVN_DEV . "/{$branchName}");
+		$ssh->exec("svn cp " . SVN_TRUNK . " " . rtim(SVN_DEV, "/ ") . "/{$branchName} -m \"Created with the GOJIRA service.\"");
+		$ssh->exec("svn co " . rtrim(SVN_DEV, "/ ") . "/{$branchName}");
 	}
 }
 ?>
