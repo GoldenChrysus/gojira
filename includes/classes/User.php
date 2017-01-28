@@ -10,30 +10,28 @@ class User {
 	];
 
 	public function __construct($id = null) {
-		global $sqlConn;
 		if ($id) {
-			$sql = "SELECT
+			$sql = 
+				"SELECT
 					*
 				FROM
 					users
 				WHERE
 					id = ?";
-			$stmt = $sqlConn->prepare($sql);
-			$stmt->bind_param("i", $id);
-			$stmt->execute();
-			$stmt->store_result();
-			if ($stmt->num_rows === 0) {
+
+			$result = Database::get($sql, [$id]);
+
+			if (!$result) {
 				return false;
 			}
-			$row = bindResultArray($stmt);
-			$stmt->fetch();
+
+			$row        = reset($result);
 			$this->data = $row;
 			$this->id   = $id;
 		}
 	}
 
 	public static function createUser($data) {
-		global $sqlConn;
 		$userSalt          = self::createSalt();
 		$jiraSalt          = self::createSalt();
 		$sshSalt           = self::createSalt();
@@ -60,31 +58,10 @@ class User {
 		$data["jira_password"]["value"] = ($data["jira_password"]["value"]) ? self::encryptPassword($jiraSalt, self::$salts["jira"], $data["jira_password"]["value"]) : null;
 		$data["ssh_password"]["value"]  = ($data["ssh_password"]["value"]) ? self::encryptPassword($sshSalt, self::$salts["ssh"], $data["ssh_password"]["value"]) : null;
 
-		$keys = implode(", ", array_keys($data));
-		$values = implode(", ",
-			array_map(function ($value) {
-				global $sqlConn;
-				switch ($value["type"]) {
-					case "int":
-						return $value["value"];
-						break;
+		$keys   = array_keys($data);
+		$values = array_values($data);
+		$userId = Database::insert("users", $keys, $values);
 
-					case "string":
-					default:
-						return "'" . $sqlConn->real_escape_string($value["value"]) . "'";
-						break;
-				}
-			}, array_values($data))
-		);
-
-		$sql = "INSERT INTO
-				users
-					({$keys})
-			VALUES
-				({$values})";
-		$stmt = $sqlConn->prepare($sql);
-		$stmt->execute();
-		$userId = $sqlConn->insert_id;
 		if (!$userId) {
 			return false;
 		}
@@ -93,12 +70,12 @@ class User {
 	}
 
 	public function update($data) {
-		global $sqlConn;
 		if (!is_array($data)) {
 			return false;
 		}
 
 		$updates = [];
+		$values  = [];
 
 		if (isset($data["username"]) || array_key_exists("username", $data)) {
 			unset($data["username"]);
@@ -119,20 +96,8 @@ class User {
 		}
 
 		foreach ($data as $key => $value) {
-			switch ($value["type"]) {
-				case "string":
-				default:
-					$updates[] = "{$key} = '" . $sqlConn->real_escape_string($value["value"]) . "'";
-					break;
-
-				case "int":
-				case "integer":
-				case "double":
-				case "float":
-				case "number":
-					$updates[] = "{$key} = {$value['value']}";
-					break;
-			}
+			$updates[] = "{$key} = ?";
+			$values[]  = $value["value"];
 		}
 
 		if (count($updates) === 0) {
@@ -140,21 +105,20 @@ class User {
 		}
 
 		$updateString = implode(", ", $updates);
-		$sql = "UPDATE
+		$values[]     = $this->id;
+		$sql          = 
+			"UPDATE
 				users
 			SET
 				{$updateString}
 			WHERE
-				id = " . $this->id;
+				id = ?";
 
-		$stmt = $sqlConn->prepare($sql);
-		$stmt->execute();
-		$stmt->close();
+		Database::query($sql, $values);
 		return true;
 	}
 
 	public function set($key, $value) {
-		global $sqlConn;
 		if (stripos($key, "_password") !== false) {
 			list($type) = explode("_", $key);
 			if (!isset(self::$salts[$type])) {
@@ -179,33 +143,15 @@ class User {
 			$value = self::hashPassword($userSalt, $value);
 		}
 
-		$type   = gettype($value);
-		$update = "";
-
-		switch($type) {
-			case "string":
-				$update = "{$key} = '" . $sqlConn->real_escape_string($value). "'";
-				break;
-
-			case "boolean":
-				$update = "{$key} = " . intval($value);
-				break;
-
-			case "double":
-			case "integer":
-				$update = "{$key} = {$value}";
-		}
-
-		$sql = "UPDATE
+		$sql = 
+			"UPDATE
 				users
 			SET
-				{$update}
+				{$key} = ?
 			WHERE
-				id = " . $this->id;
+				id = ?";
 
-		$stmt = $sqlConn->prepare($sql);
-		$stmt->execute();
-		$stmt->close();
+		Database::query($sql, [0 => [$value, $this->id]]);
 
 		return true;
 	}
@@ -264,30 +210,21 @@ class User {
 	}
 
 	public static function checkIfUsernameExists($username, $returnId = false) {
-		global $sqlConn;
-		$sql = "SELECT
+		$sql = 
+			"SELECT
 				id
 			FROM
 				users
 			WHERE
-				username = ?";
+				username = ?
+			LIMIT 1";
 
-		$stmt = $sqlConn->prepare($sql);
-		$stmt->bind_param("s", $username);
-		$stmt->execute();
-		$stmt->store_result();
+		$result = Database::get($sql, [$username]);
 
-		if ($stmt->num_rows() === 0) {
-			return false;
+		if ($result) {
+			return $result[0]["id"];
 		}
 
-		if ($returnId) {
-			$row = bindResultArray($stmt);
-			$stmt->fetch();
-			return $row["id"];
-		}
-
-		$stmt->close();
 		return true;
 	}
 
