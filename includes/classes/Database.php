@@ -29,12 +29,12 @@ class Database {
 		$keys      = implode(", ", $keys);
 		$questions = [];
 
-		for ($i = 0; $i < count($values); $i++) {
+		foreach ($values as &$value) {
+			$value       = ($value) ?: "NULL";
 			$questions[] = "?";
 		}
 
 		$questions = implode(", ", $questions);
-		$values    = implode(", ", $values);
 
 		$sql = 
 			"INSERT INTO 
@@ -44,7 +44,7 @@ class Database {
 				({$questions})";
 
 		$stmt = $pdo->prepare($sql);
-		$stmt = $pdo->execute($values);
+		$stmt->execute($values);
 
 		return $pdo->lastInsertId();
 	}

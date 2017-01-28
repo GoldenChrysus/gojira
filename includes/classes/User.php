@@ -58,7 +58,12 @@ class User {
 		$data["ssh_password"]["value"]  = ($data["ssh_password"]["value"]) ? self::encryptPassword($sshSalt, self::$salts["ssh"], $data["ssh_password"]["value"]) : null;
 
 		$keys   = array_keys($data);
-		$values = array_values($data);
+		$values = [];
+
+		foreach ($data as $dataItem) {
+			$values[] = $dataItem["value"];
+		}
+		
 		$userId = Database::insert("users", $keys, $values);
 
 		if (!$userId) {
