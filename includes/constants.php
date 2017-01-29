@@ -32,6 +32,7 @@ $issueTypes  = [
 asort($issueTypes);
 
 // Browse URL is used to provide links to JIRA issues; API URL is for making cURL calls
+$baseUrl    = rtrim($baseUrl, "/ ");
 $browseUrl  = $baseUrl . "/browse";
 $apiUrl     = $baseUrl . "/rest/api/2";
 
@@ -119,8 +120,8 @@ if ($svnMatch) {
 	}
 }
 
-define("SVN_TRUNK", $svnTrunk);
-define("SVN_DEV",   $svnDev);
+define("SVN_TRUNK", rtrim($svnTrunk, "/ "));
+define("SVN_DEV",   rtrim($svnDev, "/ "));
 
 // Some pages, like get.php, don't need this data, so they pass a $skipLoad flag
 if (!$skipLoad && $_SESSION["auth"]) {
