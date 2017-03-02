@@ -129,10 +129,17 @@ if (!$skipLoad && $_SESSION["auth"]) {
 	if (!isset($_SESSION["fix_versions"])) {
 		$majorVersion = explode(".", CURRENT_VER)[0];
 		$response     = doCurl(API_URL . "/project/" . PROJECT_ID . "/versions", unserialize(HEADERS));
+		$versions     = [];
 
 		if (!processErrors($response)) {
 			exit("There was an error fetching the versions from JIRA.");
 		}
+
+		foreach ($response as $key => $version) {
+			$versions[$key] = $version["name"];
+		}
+
+		array_multisort($versions, SORT_ASC, $response);
 
 		$latestVersion = end($response);
 		while (substr($latestVersion["name"], 0, strlen($majorVersion)) !== $majorVersion) {
