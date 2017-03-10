@@ -54,8 +54,8 @@ class User {
 		];
 
 		$data["password"]["value"]      = self::hashPassword($userSalt, $data["password"]["value"]);
-		$data["jira_password"]["value"] = ($data["jira_password"]["value"]) ? self::encryptPassword($jiraSalt, self::$salts["jira"], $data["jira_password"]["value"]) : null;
-		$data["ssh_password"]["value"]  = ($data["ssh_password"]["value"]) ? self::encryptPassword($sshSalt, self::$salts["ssh"], $data["ssh_password"]["value"]) : null;
+		$data["jira_password"]["value"] = ($data["jira_password"]["value"]) ? self::encryptPassword($jiraSalt, self::$salts["jira"], $data["jira_password"]["value"]) : "";
+		$data["ssh_password"]["value"]  = ($data["ssh_password"]["value"]) ? self::encryptPassword($sshSalt, self::$salts["ssh"], $data["ssh_password"]["value"]) : "";
 
 		$keys   = array_keys($data);
 		$values = [];
@@ -101,7 +101,7 @@ class User {
 
 		foreach ($data as $key => $value) {
 			$updates[] = "{$key} = ?";
-			$values[]  = ($value["value"]) ?: "NULL";
+			$values[]  = ($value["value"]) ?: "";
 		}
 
 		if (count($updates) === 0) {
@@ -110,6 +110,9 @@ class User {
 
 		$updateString = implode(", ", $updates);
 		$values[]     = $this->id;
+		$values       = [
+			0 => $values
+		];
 		$sql          = 
 			"UPDATE
 				users
@@ -147,7 +150,7 @@ class User {
 			$value = self::hashPassword($userSalt, $value);
 		}
 
-		$value = ($value) ?: "NULL";
+		$value = ($value) ?: "";
 
 		$data = [
 			0 => [
