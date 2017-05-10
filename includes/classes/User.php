@@ -10,14 +10,13 @@ class User {
 
 	public function __construct($id = null) {
 		if ($id) {
-			$sql = 
+			$sql    = 
 				"SELECT
 					*
 				FROM
 					users
 				WHERE
 					id = ?";
-
 			$result = Database::get($sql, [$id]);
 
 			if (!$result) {
@@ -128,11 +127,13 @@ class User {
 	public function set($key, $value) {
 		if (stripos($key, "_password") !== false) {
 			list($type) = explode("_", $key);
+
 			if (!isset(self::$salts[$type])) {
 				return false;
 			}
 
 			$userSalt = $this->get("{$type}_salt");
+
 			if (!$userSalt) {
 				return false;
 			}
@@ -151,15 +152,13 @@ class User {
 		}
 
 		$value = ($value) ?: "";
-
-		$data = [
+		$data  = [
 			0 => [
 				$value,
 				$this->id
 			]
 		];
-
-		$sql = 
+		$sql   = 
 			"UPDATE
 				users
 			SET
@@ -168,7 +167,6 @@ class User {
 				id = ?";
 
 		Database::query($sql, $data);
-
 		return true;
 	}
 
@@ -176,10 +174,13 @@ class User {
 		if (!is_array($this->data)) {
 			return false;
 		}
+
 		$result = [];
+
 		foreach ($this->data as $key => $foo) {
 			$result[$key] = $this->get($key, $realValue);
 		}
+
 		return $result;
 	}
 
@@ -191,6 +192,7 @@ class User {
 		if (!$realValue) {
 			if (stripos($key, "_password") !== false) {
 				list($type) = explode("_", $key);
+
 				return $this->getPassword($type);
 			}
 		}
@@ -208,16 +210,19 @@ class User {
 		}
 
 		$userSalt = $this->get("{$type}_salt");
+
 		if (!$userSalt) {
 			return false;
 		}
 
 		$serverSalt = (self::$salts[$type]) ?: null;
+
 		if (!$serverSalt) {
 			return false;
 		}
 
 		$password = $this->get("{$type}_password", true);
+
 		if (!$password) {
 			return false;
 		}
@@ -226,7 +231,7 @@ class User {
 	}
 
 	public static function checkIfUsernameExists($username, $returnId = false) {
-		$sql = 
+		$sql    = 
 			"SELECT
 				id
 			FROM
@@ -234,7 +239,6 @@ class User {
 			WHERE
 				username = ?
 			LIMIT 1";
-
 		$result = Database::get($sql, [$username]);
 
 		if ($result) {
@@ -268,6 +272,7 @@ class User {
 		if ($hashPassword === $password) {
 			$_SESSION["auth"]    = true;
 			$_SESSION["user_id"] = $result;
+
 			return $user;
 		}
 
@@ -284,11 +289,13 @@ class User {
 
 	private static function encryptPassword($userSalt, $serverSalt, $password) {
 		$cryptKey = substr(hash("sha512", $userSalt . $serverSalt), 0, 32);
+
 		return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $cryptKey, $password, MCRYPT_MODE_ECB));
 	}
 
 	private static function decryptPassword($userSalt, $serverSalt, $password) {
 		$cryptKey = substr(hash("sha512", $userSalt . $serverSalt), 0, 32);
+		
 		return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $cryptKey, base64_decode($password), MCRYPT_MODE_ECB));
 	}
 }

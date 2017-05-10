@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 // Get the referring URI page
 $referringPage = explode("?", array_slice(array_values(explode("/", $_SERVER["HTTP_REFERER"])), -1)[0])[0];
 $action        = false;

@@ -4,6 +4,7 @@ class Database {
 		global $pdo;
 
 		$stmt = $pdo->prepare($sql);
+
 		$stmt->execute($params);
 
 		return $stmt->fetchAll();
@@ -35,15 +36,15 @@ class Database {
 		}
 
 		$questions = implode(", ", $questions);
-
-		$sql = 
+		$sql       = 
 			"INSERT INTO 
 				{$table}
 					({$keys})
 			VALUES 
 				({$questions})";
 
-		$stmt = $pdo->prepare($sql);
+		$stmt      = $pdo->prepare($sql);
+		
 		$stmt->execute($values);
 
 		return $pdo->lastInsertId();

@@ -16,7 +16,9 @@ if ($token !== $user->get("token")) {
 }
 
 $headers     = [
-	"header" => "Content-Type: application/json",
+	"header" => [
+		"Content-Type: application/json"
+	],
 	"user"   => [
 		$user->get("jira_username"),
 		$user->get("jira_password")
