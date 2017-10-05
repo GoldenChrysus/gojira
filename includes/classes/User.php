@@ -197,7 +197,7 @@ class User {
 			}
 		}
 
-		if (is_array($this->data)) {
+		if (is_array($this->data) && array_key_exists($key, $this->data)) {
 			return $this->data[$key];
 		}
 

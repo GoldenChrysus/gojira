@@ -23,6 +23,7 @@ header("Expires: 0");
 ?>
 #!/bin/bash
 jiraId=$1
+folder=$2
 
 if [[ ! $jiraId ]]
 then
@@ -48,6 +49,13 @@ cd <?php echo $devFolder; ?>
 
 svn cp <?php echo SVN_TRUNK; ?> <?php echo rtrim(SVN_DEV, "/ "); ?>/$response -m "Created with the GOJIRA service."
 
-svn co <?php echo rtrim(SVN_DEV, "/ "); ?>/$response
+if [[ ! $folder ]]
+then
+	svn co <?php echo rtrim(SVN_DEV, "/ "); ?>/$response
+else
+	mkdir $response
+	cd $response
+	svn co <?php echo rtrim(SVN_DEV, "/ "); ?>/$response/$folder
+fi
 
 echo "Branch $response has been checked out to <?php echo rtrim($devFolder, "/ "); ?>/$response"
