@@ -11,6 +11,10 @@ if ($_POST) {
 	$zendesk     = $_POST["zendesk"];
 	$description = $_POST["description"];
 
+	if ($zendesk && !ZENDESK_FIELD) {
+		$description .= "\n\nZendesks:\n{$zendesk}";
+	}
+
 	// Construct a data array to send to JIRA's API
 	$newJira = [
 		"fields" => [
@@ -34,7 +38,7 @@ if ($_POST) {
 	];
 
 	// Only set the Zendesk field if the user specified a URL
-	if ($zendesk) {
+	if ($zendesk && ZENDESK_FIELD) {
 		$newJira["fields"][ZENDESK_FIELD] = (string) $zendesk;
 	}
 
