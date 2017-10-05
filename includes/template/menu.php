@@ -19,7 +19,7 @@ foreach (unserialize(MENU_ITEMS) as $url => $data) {
 	<a href="<?php echo $url; ?>" class="item<?php echo $active . $class; ?>">
 		<?php echo $data["name"]; ?>
 	</a>
-<?
+<?php
 }
 ?>
 </div>

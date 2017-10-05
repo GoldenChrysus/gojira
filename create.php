@@ -3,7 +3,7 @@
 <div class="ui inverted dimmer" id="loader">
 	<div class="ui text loader">Creating the JIRA Issue</div>
 </div>
-<? if (array_key_exists("new_account", $_GET)) { ?>
+<?php if (array_key_exists("new_account", $_GET)) { ?>
 <div class="ui message">
 	<i class="close icon"></i>
 	<div class="header">

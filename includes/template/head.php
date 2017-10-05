@@ -445,4 +445,4 @@ if ($_SESSION["auth"]) {
 	</head>
 <body>
 <div id="main-container" class="ui container"<?php echo ($requestFile === "login") ? " style='height:calc(100% - 2.85714286em);'" : null; ?>>
-<? include_once(__DIR__ . "/menu.php"); ?>
+<?php include_once(__DIR__ . "/menu.php"); ?>
